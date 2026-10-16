@@ -2,23 +2,18 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.database import Base, engine
-from app.models import Location
+from app.models import Location, User
 from app.routers.locations import router as locations_router
+from app.routers.auth import router as auth_router
 
-
-# Create database tables
 Base.metadata.create_all(bind=engine)
 
-
-# Initialize FastAPI application
 app = FastAPI(
     title="Kaavalal API",
     description="Kerala Disaster Management and Resource Allocation Platform",
     version="1.0.0",
 )
 
-
-# Allow requests from the React frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -32,12 +27,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-# Register district routes
 app.include_router(locations_router)
+app.include_router(auth_router)
 
 
-# Root endpoint
 @app.get("/")
 def root():
     return {
@@ -46,9 +39,6 @@ def root():
     }
 
 
-# Health check endpoint
 @app.get("/health")
 def health_check():
-    return {
-        "status": "healthy",
-    }
+    return {"status": "healthy"}
